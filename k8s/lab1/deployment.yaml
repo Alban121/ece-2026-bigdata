@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kubernetes-bootcamp
+  labels:
+    app: kubernetes-bootcamp
+spec:
+  replicas: 3                     # TO COMPLETE #2 (passera à 3 plus bas)
+  selector:
+    matchLabels:
+      app: kubernetes-bootcamp     # le Deployment gère les pods qui ont ce label
+  template:                        # modèle des pods à créer
+    metadata:
+      labels:
+        app: kubernetes-bootcamp   # doit correspondre au selector ci-dessus
+    spec:
+      containers:
+      - name: kubernetes-bootcamp
+        # TO COMPLETE #1
+        image: gcr.io/google-samples/kubernetes-bootcamp:v1
+        ports:
+        - containerPort: 8080      # port d'écoute de server.js
+        resources:                 # pas demandé par l'énoncé, mais souvent exigé par les quotas Onyxia
+          requests:
+            cpu: 50m
+            memory: 64Mi
+          limits:
+            cpu: 200m
+            memory: 128Mi

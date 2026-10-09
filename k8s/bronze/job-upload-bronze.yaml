@@ -1,0 +1,41 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: upload-bronze
+spec:
+  backoffLimit: 2                  # 2 nouvelles tentatives max si le pod échoue
+  ttlSecondsAfterFinished: 3600    # le Job et son pod sont supprimés automatiquement 1 h après la fin
+  template:
+    spec:
+      restartPolicy: Never         # obligatoire pour un Job : Never ou OnFailure
+      containers:
+        - name: upload
+          image: amazon/aws-cli:latest
+          command: ["sh", "-c"]
+          args:
+            - |
+              set -e
+              for dataset in users orders; do
+                aws s3 cp "/data/$dataset.csv" "s3://$LAB_BUCKET_NAME/bronze/$dataset.csv"
+              done
+              aws s3 ls "s3://$LAB_BUCKET_NAME/bronze/" --recursive
+          envFrom:
+            - configMapRef:
+                name: s3-config
+            - secretRef:
+                name: s3-credentials
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m            # AJOUT : exigé par le quota onyxia-quota
+              memory: 256Mi
+          volumeMounts:
+            - name: datasets
+              mountPath: /data
+              readOnly: true
+      volumes:
+        - name: datasets
+          configMap:
+            name: datasets

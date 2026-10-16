@@ -8,3 +8,5 @@ __pycache__/
 delete.json
 lifecycle.json
 policy.json
+*.duckdb
+init.sql

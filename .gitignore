@@ -10,3 +10,7 @@ lifecycle.json
 policy.json
 *.duckdb
 init.sql
+target/
+dbt_packages/
+logs/
+*.duckdb
